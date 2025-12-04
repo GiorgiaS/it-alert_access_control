@@ -1,0 +1,10 @@
+{   
+    "allowed_alert_type_from_sender":{
+        "rrn": ["heavy-rain"]
+        },
+    "allowed_alert_type_from_area":{
+        "area1": ["heavy-rain", "radio-chemical"],
+        "area2": ["heavy-rain", "volcanic"],
+        "area3": ["radio-chemical"]
+    }
+}

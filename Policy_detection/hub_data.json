@@ -1,0 +1,10 @@
+{   
+    "allowed_source_by_dest":{
+        "cbe": ["dpc", "rrn"]
+    },
+    "allowed_cbe_parameters":{
+        "severity": ["extreme", "severe"],
+        "certainty": ["observed", "likely"]
+    }
+
+}

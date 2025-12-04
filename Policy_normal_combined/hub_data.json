@@ -1,0 +1,10 @@
+{   
+    "destinations":[
+        {"id": "cbe",
+        "severity": ["extreme", "severe"],
+        "certainty": ["observed", "likely"]},
+        {"id": "exporter",
+        "severity": ["extreme", "severe", "moderate", "minor"],
+        "certainty": ["observed", "likely", "possible", "unlikely"]}
+    ]
+}

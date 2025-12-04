@@ -1,0 +1,10 @@
+{
+    "parameters": {
+        "event": "heavy-rain",
+        "sender": "rrn",
+        "area": "area1",
+        "severity": "extreme",
+        "certainty": "observed"
+    }
+}
+

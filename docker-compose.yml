@@ -1,0 +1,49 @@
+# https://github.com/bitnami/containers/tree/main/bitnami/kafka#how-to-use-this-image
+
+networks:
+  it-alert:
+    driver: bridge
+
+services:
+  zookeeper:
+    image: wurstmeister/zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    networks:
+      - it-alert
+  kafka:
+    image: wurstmeister/kafka # image ID: 2.13_2.8.1
+    container_name: kafka
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9093
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
+      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      HOSTNAME_COMMAND: "echo localhost"
+      KAFKA_CREATE_TOPICS: "hub-topic:1:1"
+    networks:
+      - it-alert
+
+  opa:
+    image: openpolicyagent/opa:1.5.1
+    container_name: opa
+    ports:
+      - "8181:8181"
+    command:
+      - "run"
+      - "--server"
+      - "--set=decision_logs.console=true"
+      - "--addr=0.0.0.0:8181"
+    depends_on:
+      - kafka
+    networks: 
+      - it-alert
+
+
+
