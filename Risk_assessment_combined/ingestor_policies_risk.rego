@@ -11,38 +11,31 @@ area := input.parameters.area
 allowed_alert_type_from_sender := data.ingestor_data.allowed_alert_type_from_sender[sender]
 allowed_alert_type_from_area := data.ingestor_data.allowed_alert_type_from_area[area]
 
-default safety_risk = 100
-default security_risk = 100
+# Risk assessment
+default p_h = 0.8
+default p_a = 0.3
+default i_h = 7
+default i_f = 4
+default efficacy = 0.8
+default trust = 0.6
+default plausibility = 0.3
+default ioc = 0.8
+default risk_assessment := ""
 
-# Sender risk
-default sender_w = 0.7
-default sender_max = 3
-risk_sender := 3 if sender == "uds"
-risk_sender := 2 if sender == "rrn"
-risk_sender := 1 if sender == "cbe"
-
-# Event risk (mountain area)
-default event_w = 0.3
-default event_max = 4
-risk_event := 4 if event == "tsunami"
-risk_event := 3 if event == "nuclear"
-risk_event := 2 if event == "industrial"
-risk_event := 1 if event == "heavy-rain"
-
-# Safety risk parameters
-default p_ev := 0.75
-default i_ev = 6
-default i_fa := 2
-default ef := 0.8
 
 # Assess security risk
-security_risk := x if {
-    x := sender_w*(risk_sender/sender_max)+event_w*(risk_event/event_max)
+no_message_risk := x if {
+    x := p_a * p_h * i_h
 }
 
-safety_risk := x if {
-        x := (1-p_ev)*i_fa*security_risk+(p_ev*i_ev*(1-ef)+(1-p_ev)*i_fa)*(1-security_risk)
+message_risk:= x if {
+        r_m = p_h * i_h * (1-efficacy) - (1-p_h) * i_f
+        x := (1-p_a) * r_m
         }
+
+risk_assessment := "send" if {
+    no_message_risk > message_risk
+} else := "not send"
 
 allow if {
     event in allowed_alert_type_from_sender
@@ -51,6 +44,7 @@ allow if {
 
 decision := {
     "allow": allow,
-    "safety_risk": safety_risk, 
-    "security_risk": security_risk, 
+    "no_message_risk": no_message_risk, 
+    "message_risk": message_risk, 
+    "risk_assessment": risk_assessment
 }
