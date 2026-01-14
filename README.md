@@ -1,7 +1,13 @@
 This project is a sample version of the IT-Alert platform for testing access control in paper:
 Risk-based Authorization in Safety Critical Microservice Architectures.
 ```
-Paper under review
+@inproceedings{tbd,
+  title={Risk-based Authorization in Safety Critical Microservice Architectures},
+  author={Sirigu, Giorgia and Burastero, Alessandro and Armando, Alessandro},
+  booktitle={Joint National Conference on Cybersecurity (ITASEC \& SERICS 2026)},
+  year={2026},
+  organization={CEUR}
+}
 ```
 
 ## Requirements
