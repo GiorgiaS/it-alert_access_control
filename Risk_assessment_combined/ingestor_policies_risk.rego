@@ -13,43 +13,45 @@ allowed_alert_type_from_area := data.ingestor_data.allowed_alert_type_from_area[
 
 # Risk assessment
 default p_h := 0.8
-default p_a := 0.3
+default p_a_fn := 0.3
+default p_a_fp := 0.6
 default i_h := 7
 default i_f := 4
 default efficacy := 0.8
 default trust := 0.6
 default plausibility := 0.3
 default ioc := 0.8
-default risk_assessment_fn := "not send"
-default risk_assessment_fp := "not send"
+default r_u := 100
+default expected_risk_fn := 0
+default expected_risk_fp := 0
+default x := 100
+default y := 0
+default risk_assessment_fn := "don't"
+default risk_assessment_fp := "don't"
 
+r_u := x if {
+    x := p_h * i_h
+}
 
 # Assess False Negative
-no_message_risk_fn := x if {
-    x := p_a * p_h * i_h
+expected_risk_fn := y if {
+    rr := p_h * i_h * efficacy
+    r_m := p_h * i_h - rr
+    y := p_a_fn * r_u + (1 - p_a_fn) * r_m + (1 - p_h) * i_f 
 }
-
-message_risk_fn:= x if {
-        r_m = p_h * i_h * (1-efficacy) - (1-p_h) * i_f
-        x := (1-p_a) * r_m
-        }
-
 risk_assessment_fn := "send" if {
-    no_message_risk_fn > message_risk_fn
+    expected_risk_fn < r_u
 } 
+
 # Assess False Positive
-no_message_risk_fp := x if {
-    x := (1-p_a) * p_h * i_h
+expected_risk_fp := y if {
+    rr := p_h * i_h * efficacy
+    r_m := p_h * i_h - rr
+    y := p_a_fp * r_u + (1- p_a_fp) * r_m + (1-p_h) * i_f 
 }
-
-message_risk_fp:= x if {
-        r_m = p_h * i_h * (1-efficacy) - (1-p_h) * i_f
-        x := (p_a) * r_m
-        }
-
-risk_assessment_fn := "send" if {
-    no_message_risk_fn > message_risk_fp
-}
+risk_assessment_fp := "send" if {
+    expected_risk_fp < r_u
+} 
 
 allow if {
     event in allowed_alert_type_from_sender
@@ -58,10 +60,9 @@ allow if {
 
 decision := {
     "allow": allow,
-    "no_message_risk_fn": no_message_risk_fn, 
-    "message_risk_fn": message_risk_fn, 
+    "R_U": r_u,
+    "expected_risk_fn": expected_risk_fn, 
     "risk_assessment_fn": risk_assessment_fn,
-    "no_message_risk_fp": no_message_risk_fp, 
-    "message_risk_fp": message_risk_fp, 
+    "expected_risk_fp": expected_risk_fp, 
     "risk_assessment_fp": risk_assessment_fp
 }
